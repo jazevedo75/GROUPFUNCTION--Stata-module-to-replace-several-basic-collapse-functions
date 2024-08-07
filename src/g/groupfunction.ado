@@ -1,4 +1,6 @@
-*!version 2.2		(28 Jan 2021)	
+*!version 2.2.1 (7 Aug 2024)
+* Created _myGini program to call python function for Gini calculation. Adjusted the main code to call this new function.
+* version 2.2		(28 Jan 2021)	
 * Fixed python code, added from __main__ import gini
 * version 2.1.1		(27 Jan 2021)	
 *   fix python indetention
@@ -660,16 +662,15 @@ foreach x of local options{
 		else{
 			if ("`x'"=="gini"){
 				cap python: from __main__ import gini ; gini("`vlist'","`wvar'","`touse1'")
-				if _rc!=0{
-					display as error "No Python :("
+				cap _myGini `vlist' if `touse1' [aw=`wvar']
+				if (_rc==0){
+					return local `x' = r(gini)
+				}
+				else{
 					mata:p=_CPB`x'(y,w)
 					mata: st_local("_x0",strofreal(p))
 					return local `x' = `_x0'
 				} 
-				else{
-				    display as error "Yay Python!"
-					return local `x' = r(gini)
-				}
 			}
 			else{
 				mata:p=_CPB`x'(y,w)
@@ -765,10 +766,25 @@ function theexpanse(real matrix info, real matrix xx){
 end
 
 //The below is ready to insert into and ado! Yay you!!
-cap python query
+program _myGini
+	version 16
+	syntax varlist(max=1 numeric) [if] [in] [aw pw fw]
+	marksample touse1					 
+	local vlist: list uniq varlist
+	local wvar : word 2 of `exp'
+	if "`wvar'"=="" {
+		tempvar w
+		gen `w' = 1
+		local wvar `w'
+	}
+	
+	python: from __main__ import gini ; gini("`vlist'","`wvar'","`touse1'")
+		
+end
 
+cap python query
 if _rc==0{
-python
+python:
 from sfi import Data
 import numpy as np
 from numpy import cumsum
