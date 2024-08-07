@@ -661,7 +661,6 @@ foreach x of local options{
 		}
 		else{
 			if ("`x'"=="gini"){
-				cap python: from __main__ import gini ; gini("`vlist'","`wvar'","`touse1'")
 				cap _myGini `vlist' if `touse1' [aw=`wvar']
 				if (_rc==0){
 					return local `x' = r(gini)
