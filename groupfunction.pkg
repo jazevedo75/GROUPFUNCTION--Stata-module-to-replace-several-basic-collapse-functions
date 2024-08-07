@@ -1,8 +1,9 @@
-v 2.2
+v 2.2.1
 d 'GROUPFUNCTION': Stata module to replace several basic collapse functions
 d 
 d Distribution-Date: 28 Jan 2021
 d License: MIT
 d 
+F src/_/_myGini.ado
 F src/g/groupfunction.ado
 F src/g/groupfunction.sthlp
